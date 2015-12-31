@@ -41,8 +41,9 @@ void Asteroid::Update() {
 	this->Rotate(rotationAmount);
 	
 	//Move the asteroid
-	this->SetPosition( posX + this->moveVector.GetX(),
-		posY +this->moveVector.GetY());
+	posX += this->moveVector.GetX();
+	posY += this->moveVector.GetY();
+	this->SetPosition(posX, posY);
 
 	//Check to see if the asteroid is "off screen". If it is, teleport
 	//it to just off screen on the opposite side, such that it "wraps 
@@ -72,8 +73,6 @@ void Asteroid::Update() {
 
 	if (offScreen) {
 		float newX, newY;
-		newX = 0;
-		newY = 0;
 		if (posX > 1.0f) {
 			//The asteroid has gone off the right of the screen
 			newX = -0.99f;
@@ -90,6 +89,12 @@ void Asteroid::Update() {
 			//The asteroid has gone off the bottom of the screen
 			newX = posX;
 			newY = 0.99f;
+		} else {
+			std::cout << "What hte fug" << std::endl;
+			std::cout << "X: " << posX << std::endl;
+			std::cout << "Y: " << posY << std::endl;
+			newX = 0;
+			newY = 0;
 		}
 		this->SetPosition(newX, newY);
 
@@ -116,13 +121,10 @@ void Asteroid::Render() {
 	float tempX = this->worldPosition.GetX();
 	float tempY = this->worldPosition.GetY();
 
-	std::cout << "X: " << tempX << std::endl;
-	std::cout << "Y: " << tempY << std::endl;
-
 	glBegin(GL_LINE_LOOP);
 	for(int currentPoint = 0; currentPoint < 8; ++ currentPoint)
-		glVertex2f(tempX + asteroidPoints[currentPoint].GetX(),
-			tempY + asteroidPoints[currentPoint].GetY());
+		glVertex2f(tempX + this->asteroidPoints[currentPoint].GetX(),
+			tempY + this->asteroidPoints[currentPoint].GetY());
 	glEnd();
 	
 }
@@ -147,8 +149,11 @@ void Asteroid::ApplyGravity(GameObject* target) {
 	targetX = target->GetPosition()->GetX();
 	targetY = target->GetPosition()->GetY();
 
-	newX = posX + ((targetX - posX) * target->GetMass());
-	newY = posY + ((targetY - posY) * target->GetMass());
+	newX = ((targetX - posX) * target->GetMass());
+	newY = ((targetY - posY) * target->GetMass());
+
+	this->moveVector.SetX(this->moveVector.GetX() + newX);
+	this->moveVector.SetY(this->moveVector.GetY() + newY);
 }
 
 Vector2D* Asteroid::GetPosition() {
@@ -175,7 +180,7 @@ void Asteroid::GenerateAsteroid() {
 	float lowerBound = -30.0f;
 	float divisor = 1000.0f;
 
-	mass = 0.1f;
+	mass = 0.0001f;
 
 	//Set a random rotation amount
 	rotationAmount = ((rand() % 4) - 2.0f) / 10.0f;

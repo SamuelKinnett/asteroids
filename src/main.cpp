@@ -21,8 +21,8 @@ void Initialise(int argc, char* argv[]) {
 
 	//TESTING
 	gameObjects.push_back(new Asteroid());
-	//gameObjects.push_back(new Asteroid(0.5f, 0.5f));
-	//gameObjects.push_back(new Asteroid(-0.5f, -0.5f));
+	gameObjects.push_back(new Asteroid(0.5f, 0.5f));
+	gameObjects.push_back(new Asteroid(-0.5f, -0.5f));
 	glutMainLoop();
 }
 
@@ -70,11 +70,11 @@ bool InitOpenGL() {
 
 void Update() {
 	for (int i = 0; i < (int) gameObjects.size(); ++i) {
-		gameObjects[i]->Update();
 		for (int c = 0; c < (int) gameObjects.size(); ++c) {
 			if (c != i)
 				gameObjects[i]->ApplyGravity(gameObjects[c]);
 		}
+		gameObjects[i]->Update();
 	}
 }
 
