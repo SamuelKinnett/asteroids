@@ -8,7 +8,7 @@ using namespace std;
 int windowHandle = 0;
 int screenSize[2] = {DEFAULT_WIDTH, DEFAULT_HEIGHT};
 
-Asteroid* asteroid = new Asteroid();
+vector<GameObject*> gameObjects;
 
 int main (int argc, char* argv[]) {
 	Initialise(argc, argv);
@@ -18,7 +18,11 @@ int main (int argc, char* argv[]) {
 void Initialise(int argc, char* argv[]) {
 	InitWindow(argc, argv);
 	InitOpenGL();
-	
+
+	//TESTING
+	gameObjects.push_back(new Asteroid());
+	gameObjects.push_back(new Asteroid(0.5f, 0.5f));
+	gameObjects.push_back(new Asteroid(-0.5f, -0.5f));
 	glutMainLoop();
 }
 
@@ -65,7 +69,13 @@ bool InitOpenGL() {
 }
 
 void Update() {
-	//Nothing here at the moment.
+	for (int i = 0; i < (int) gameObjects.size(); ++i) {
+		gameObjects[i]->Update();
+		for (int c = 0; c < (int) gameObjects.size(); ++c) {
+			if (c != i)
+				gameObjects[i]->ApplyGravity(gameObjects[c]);
+		}
+	}
 }
 
 void Render() {
@@ -73,7 +83,9 @@ void Render() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	//Drawing code goes here
-	asteroid->Render();	
+	for (int currentObject = 0; currentObject < (int)gameObjects.size(); ++currentObject) {
+		gameObjects[currentObject]->Render();
+	}	
 	//End drawing code
 	
 	glutSwapBuffers();

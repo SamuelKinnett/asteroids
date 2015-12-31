@@ -14,27 +14,37 @@
 #include "GL/gl.h"
 #include <ctime>
 
-class Asteroid : GameObject {
+class Asteroid : public GameObject {
 
 	public:
 		Asteroid(float x = 0.0f, float y = 0.0f);
 		~Asteroid();
 
 		virtual void Update();
-		virtual void Move(float x, float y);
+		virtual void SetMoveVector(Vector2D*);
+		virtual void SetPosition(float, float);
+		virtual void Rotate(float);
 		virtual void Render();
 		virtual bool AABB(GameObject*);
 		virtual bool SAT(GameObject*);
 		virtual void Collide();
+		virtual void ApplyGravity(GameObject*);
+
+		virtual Vector2D* GetPosition();
+		virtual float GetMass();
+		virtual void SetMass(float);
 
 	private:
 		
 		Vector2D worldPosition;
+		Vector2D moveVector;
+		float rotationAmount;
 		float BoundingBox[4];
 		void RecalculateBB();
 		void GenerateAsteroid();
 		
 		int size;
+		float mass;
 		Vector2D asteroidPoints[8];
 
 };
