@@ -12,11 +12,12 @@
 #include "Windows.h"
 #endif
 #include "GL/gl.h"
+#include <ctime>
 
 class Asteroid : GameObject {
 
 	public:
-		Asteroid();
+		Asteroid(float x = 0.0f, float y = 0.0f);
 		~Asteroid();
 
 		virtual void Update();

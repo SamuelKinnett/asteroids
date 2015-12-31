@@ -14,7 +14,8 @@
 #include <iostream>
 
 //Custom classes
-
+#include "gameobject.h"
+#include "asteroid.h"
 
 //Method definitions
 void Initialise(int, char*[]);

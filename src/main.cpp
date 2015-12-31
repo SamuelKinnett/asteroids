@@ -8,6 +8,8 @@ using namespace std;
 int windowHandle = 0;
 int screenSize[2] = {DEFAULT_WIDTH, DEFAULT_HEIGHT};
 
+Asteroid* asteroid = new Asteroid();
+
 int main (int argc, char* argv[]) {
 	Initialise(argc, argv);
 }
@@ -71,7 +73,7 @@ void Render() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	//Drawing code goes here
-	
+	asteroid->Render();	
 	//End drawing code
 	
 	glutSwapBuffers();

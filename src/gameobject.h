@@ -7,10 +7,9 @@
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
 
-#include "renderable.h"
 #include "vector2D.h"
 
-class GameObject : Renderable {
+class GameObject {
 
 	public:		
 		virtual void Update() = 0;
@@ -20,7 +19,7 @@ class GameObject : Renderable {
 		//Axis Alligned Bounding Box collision detection
 		virtual bool SAT(GameObject*) = 0;
 		//Separating Axis Theorem collision detection
-		virtual void collide() = 0;
+		virtual void Collide() = 0;
 };
 
 #endif
