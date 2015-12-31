@@ -72,22 +72,24 @@ void Asteroid::Update() {
 
 	if (offScreen) {
 		float newX, newY;
+		newX = 0;
+		newY = 0;
 		if (posX > 1.0f) {
 			//The asteroid has gone off the right of the screen
-			newX = -1.0f;
+			newX = -0.99f;
 			newY = posY;
 		} else if (posX < -1.0f) {
 			//The asteroid has gone off the left of the screen
-			newX = 1.0f;
+			newX = 0.99f;
 			newY = posY;
 		} else if (posY > 1.0f) {
 			//The asteroid has gone off the top of the screen
 			newX = posX;
-			newY = -1.0f;
-		} else {
+			newY = -0.99f;
+		} else if (posY < -1.0f) {
 			//The asteroid has gone off the bottom of the screen
 			newX = posX;
-			newY = 1.0f;
+			newY = 0.99f;
 		}
 		this->SetPosition(newX, newY);
 
@@ -113,6 +115,9 @@ void Asteroid::SetPosition(float x, float y) {
 void Asteroid::Render() {
 	float tempX = this->worldPosition.GetX();
 	float tempY = this->worldPosition.GetY();
+
+	std::cout << "X: " << tempX << std::endl;
+	std::cout << "Y: " << tempY << std::endl;
 
 	glBegin(GL_LINE_LOOP);
 	for(int currentPoint = 0; currentPoint < 8; ++ currentPoint)
@@ -170,7 +175,7 @@ void Asteroid::GenerateAsteroid() {
 	float lowerBound = -30.0f;
 	float divisor = 1000.0f;
 
-	mass = 0.01f;
+	mass = 0.1f;
 
 	//Set a random rotation amount
 	rotationAmount = ((rand() % 4) - 2.0f) / 10.0f;

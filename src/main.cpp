@@ -21,8 +21,8 @@ void Initialise(int argc, char* argv[]) {
 
 	//TESTING
 	gameObjects.push_back(new Asteroid());
-	gameObjects.push_back(new Asteroid(0.5f, 0.5f));
-	gameObjects.push_back(new Asteroid(-0.5f, -0.5f));
+	//gameObjects.push_back(new Asteroid(0.5f, 0.5f));
+	//gameObjects.push_back(new Asteroid(-0.5f, -0.5f));
 	glutMainLoop();
 }
 
