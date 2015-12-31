@@ -108,7 +108,7 @@ void Asteroid::SetMoveVector(Vector2D* newVector) {
 void Asteroid::Rotate(float angle) {
 	for (int currentPoint = 0; currentPoint < 8; ++ currentPoint) {
 		asteroidPoints[currentPoint].Rotate(angle,
-			       			&this->worldPosition);
+			       			new Vector2D(0, 0));
 	}
 }
 
