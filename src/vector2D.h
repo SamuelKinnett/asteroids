@@ -1,9 +1,10 @@
-//Credit to Minsi Chen for this class
+//Credit to Minsi Chen for the initial implementation of this class
 
 #ifndef VECTOR_2D_H
 #define VECTOR_2D_H
 
 #include <string>
+#include <cmath>
 
 class Vector2D
 {
@@ -21,6 +22,8 @@ class Vector2D
 		Vector2D& operator= (const Vector2D &rhs);
 		const Vector2D operator+(const Vector2D &other) const;
 		const Vector2D operator-(const Vector2D &other) const;
+		
+		void Rotate(float angle, Vector2D* pivot);
 
 	private:
 		float _x;

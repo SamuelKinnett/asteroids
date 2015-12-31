@@ -72,6 +72,27 @@ const Vector2D Vector2D::operator-(const Vector2D &other) const
 	return result;
 }
 
+void Vector2D::Rotate(float angle, Vector2D* pivot) {
+
+	angle = angle * 0.0174533; //Convert angle to radians
+
+	float sinAngle = sin(angle);
+	float cosAngle = cos(angle);
+
+	//Translate the vector back to the origin, then rotate
+	
+	this->SetX(this->GetX() - pivot->GetX());
+	this->SetY(this->GetY() - pivot->GetY());
+
+	float rotatedX = this->GetX() * cosAngle
+		- this->GetY() * sinAngle;
+	float rotatedY = this->GetX() * sinAngle
+		+ this->GetY() * cosAngle;
+
+	//Translate the vector back to its new position
+	this->SetX(rotatedX + pivot->GetX());
+	this->SetY(rotatedY + pivot->GetY());
+}
 
 // Private methods
 
