@@ -27,6 +27,8 @@ class GameObject {
 		virtual Vector2D* GetPosition() = 0;
 		virtual float GetMass() = 0;
 		virtual void SetMass(float) = 0;
+
+		bool gravAffected = false;	//Is the object affected by gravity?
 };
 
 #endif

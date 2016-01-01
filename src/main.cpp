@@ -70,9 +70,11 @@ bool InitOpenGL() {
 
 void Update() {
 	for (int i = 0; i < (int) gameObjects.size(); ++i) {
-		for (int c = 0; c < (int) gameObjects.size(); ++c) {
-			if (c != i)
-				gameObjects[i]->ApplyGravity(gameObjects[c]);
+		if (gameObjects[i]->gravAffected) {
+			for (int c = 0; c < (int) gameObjects.size(); ++c) {
+				if (c != i)
+					gameObjects[i]->ApplyGravity(gameObjects[c]);
+			}
 		}
 		gameObjects[i]->Update();
 	}

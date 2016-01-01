@@ -180,7 +180,7 @@ void Asteroid::GenerateAsteroid() {
 	float lowerBound = -30.0f;
 	float divisor = 1000.0f;
 
-	mass = 0.0001f;
+	mass = 0.00001f;
 
 	//Set a random rotation amount
 	rotationAmount = ((rand() % 4) - 2.0f) / 10.0f;
