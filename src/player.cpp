@@ -1,7 +1,18 @@
 #include "player.h"
 
 Player::Player() {
+	this->worldPosition.SetX(0);
+	this->worldPosition.SetY(0);
 
+	//Construct the player graphic
+	this->shipPoints[0].SetX(-0.01f);
+	this->shipPoints[0].SetY(-0.02f);
+	this->shipPoints[1].SetX(0.0f);
+	this->shipPoints[1].SetY(0.0f);
+	this->shipPoints[2].SetX(0.01f);
+	this->shipPoints[2].SetY(-0.02f);
+	this->shipPoints[3].SetX(0);
+	this->shipPoints[3].SetY(0.02f);
 }
 
 Player::~Player() {
@@ -27,7 +38,7 @@ void Player::Update() {
 	
 	bool offScreen = true;
 
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 4; ++i) {
 		float pointX = this->shipPoints[i].GetX();
 		float pointY = this->shipPoints[i].GetY();
 
@@ -92,7 +103,7 @@ void Player::Rotate(float angle) {
 		currentRotation += angle;
 
 	//Update the ship's vector graphics
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 4; ++i) {
 		this->shipPoints[i].Rotate(angle, new Vector2D(0.0f, 0.0f));
 	}
 
@@ -105,8 +116,7 @@ void Player::Render() {
 	float tempY = this->worldPosition.GetY();
 
 	glBegin(GL_LINE_LOOP);
-	glVertex2f(tempX, tempY);
-	for (int currentPoint = 0; currentPoint < 3; ++ currentPoint)
+	for (int currentPoint = 0; currentPoint < 4; ++ currentPoint)
 		glVertex2f(tempX + this->shipPoints[currentPoint].GetX(),
 			tempY + this->shipPoints[currentPoint].GetY());
 	glEnd();

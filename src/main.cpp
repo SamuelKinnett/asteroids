@@ -9,6 +9,7 @@ int windowHandle = 0;
 int screenSize[2] = {DEFAULT_WIDTH, DEFAULT_HEIGHT};
 
 vector<GameObject*> gameObjects;
+Player* player;
 
 int main (int argc, char* argv[]) {
 	Initialise(argc, argv);
@@ -19,6 +20,8 @@ void Initialise(int argc, char* argv[]) {
 	InitWindow(argc, argv);
 	InitOpenGL();
 
+	//Initialise the player
+	player = new Player();
 	//TESTING
 	gameObjects.push_back(new Asteroid());
 	gameObjects.push_back(new Asteroid(0.5f, 0.5f));
@@ -88,6 +91,10 @@ void Render() {
 	for (int currentObject = 0; currentObject < (int)gameObjects.size(); ++currentObject) {
 		gameObjects[currentObject]->Render();
 	}	
+	
+	//Draw the player
+	player->Render();
+	
 	//End drawing code
 	
 	glutSwapBuffers();

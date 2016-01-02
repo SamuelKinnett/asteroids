@@ -37,7 +37,7 @@ class Player : public GameObject {
 
 	private:
 
-		Vector2D shipPoints[3];
+		Vector2D shipPoints[4];
 		Vector2D worldPosition;
 		Vector2D moveVector;
 		float mass;
