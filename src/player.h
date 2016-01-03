@@ -33,7 +33,12 @@ class Player : public GameObject {
 		virtual float GetMass();
 		virtual void SetMass(float);
 
-		float currentVelocity;
+		void BeginSmoothRotation(float);
+		void StopSmoothRotation();
+		void BeginAcceleration(float);
+		void StopAcceleration();
+
+		void SetVelocity(float);
 
 	private:
 
@@ -41,8 +46,17 @@ class Player : public GameObject {
 		Vector2D worldPosition;
 		Vector2D moveVector;
 		float mass;
-		float currentRotation;
 
+		float currentRotation;
+		float currentRotationAmount;
+		bool rotating;
+
+		float currentVelocity;
+		float acceleration;
+		float maximumVelocity;
+		float deceleration;
+		bool moving;	//As in, is the player holding down the 
+				// move key
 };
 
 #endif

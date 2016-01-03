@@ -54,6 +54,7 @@ void InitWindow(int argc, char* argv[]) {
 	glutReshapeFunc(Resize);
 	glutKeyboardFunc(HandleButtonPress);
 	glutSpecialFunc(HandleSpecialButtonPress);
+	glutSpecialUpFunc(HandleSpecialButtonRelease);
 }
 
 //Initialises OpenGL
@@ -79,8 +80,11 @@ void Update() {
 					gameObjects[i]->ApplyGravity(gameObjects[c]);
 			}
 		}
+		player->ApplyGravity(gameObjects[i]);
 		gameObjects[i]->Update();
 	}
+
+	player->Update();
 }
 
 void Render() {
@@ -129,7 +133,39 @@ void HandleButtonPress(unsigned char key, int x, int y) {
 
 //Handles special key input
 void HandleSpecialButtonPress(int key, int x, int y) {
+	
+	switch (key) {
 
+		case GLUT_KEY_LEFT:
+			player->BeginSmoothRotation(2.0f);
+			break;
+
+		case GLUT_KEY_RIGHT:
+			player->BeginSmoothRotation(-2.0f);
+			break;
+
+		case GLUT_KEY_UP:
+			player->BeginAcceleration(0.02f);
+			break;
+	}
+}
+
+void HandleSpecialButtonRelease(int key, int x, int y) {
+
+	switch (key) {
+		
+		case GLUT_KEY_LEFT:
+			player->StopSmoothRotation();
+			break;
+
+		case GLUT_KEY_RIGHT:
+			player->StopSmoothRotation();
+			break;
+
+		case GLUT_KEY_UP:
+			player->StopAcceleration();
+			break;
+	}
 }
 
 //Handles the window being resized

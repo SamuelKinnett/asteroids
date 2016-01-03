@@ -32,5 +32,6 @@ void HandleMouseClick(int, int, int, int);
 void HandleMouseMoving(int, int);
 void HandleButtonPress(unsigned char, int, int);
 void HandleSpecialButtonPress(int, int, int);
+void HandleSpecialButtonRelease(int, int, int);
 
 #endif

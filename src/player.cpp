@@ -13,6 +13,11 @@ Player::Player() {
 	this->shipPoints[2].SetY(-0.02f);
 	this->shipPoints[3].SetX(0);
 	this->shipPoints[3].SetY(0.02f);
+
+	//Set the movement variables
+	this->acceleration = 0.004f;
+	this->deceleration = 0.001f;
+	this->currentRotation = 0;
 }
 
 Player::~Player() {
@@ -24,7 +29,29 @@ void Player::Update() {
 	float posX = this->worldPosition.GetX();
 	float posY = this->worldPosition.GetY();
 
+	//Accelerate / decelerate as necessarry
+	
+	if (this->moving) {
+		if (this->currentVelocity + this->acceleration  < 
+				this->maximumVelocity)
+			this->currentVelocity += this->acceleration;
+		else
+			this->currentVelocity = this->maximumVelocity;
+	} else {
+		if (this->currentVelocity - this->deceleration > 0)
+			this->currentVelocity -= this->deceleration;	
+		else
+			this->currentVelocity = 0;
+	}
+
+	if (this->rotating) {
+		this->Rotate(currentRotationAmount);
+	} else {
+
+	}
+	
 	//Update the moveVector
+	
 	this->moveVector.SetX(0);
 	this->moveVector.SetY(this->currentVelocity);
 	this->moveVector.Rotate(this->currentRotation, new Vector2D(0, 0));
@@ -92,6 +119,32 @@ void Player::SetPosition(float x, float y) {
 	this->worldPosition.SetY(y);
 }
 
+void Player::SetVelocity(float velocity) {
+	
+	this->currentVelocity = velocity;
+}
+
+void Player::BeginSmoothRotation(float angle) {
+	
+	this->rotating = true;
+	this->currentRotationAmount = angle;
+}
+
+void Player::StopSmoothRotation() {
+
+	this->rotating = false;
+}
+
+void Player::BeginAcceleration(float velocity) {
+
+	this->moving = true;
+	this->maximumVelocity = velocity;
+}
+
+void Player::StopAcceleration() {
+	
+	this->moving = false;
+}
 void Player::Rotate(float angle) {
 
 	//Update the currentRotation variable
