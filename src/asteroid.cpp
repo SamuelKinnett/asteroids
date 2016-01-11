@@ -3,10 +3,10 @@
 
 Asteroid::Asteroid(float x, float y) {
 	
-	this->worldPosition.SetX(x);
-	this->worldPosition.SetY(y);
-	this->GenerateAsteroid();
-	this->RecalculateBB();
+	worldPosition.SetX(x);
+	worldPosition.SetY(y);
+	GenerateAsteroid();
+	RecalculateBB();
 
 	size = 2;
 
@@ -24,8 +24,8 @@ Asteroid::Asteroid(float x, float y) {
 	else
 		yMod = -1;
 
-	this->moveVector.SetX(xMagnitude * xMod);
-	this->moveVector.SetY(yMagnitude * yMod);
+	moveVector.SetX(xMagnitude * xMod);
+	moveVector.SetY(yMagnitude * yMod);
 }
 
 Asteroid::~Asteroid() {
@@ -34,16 +34,22 @@ Asteroid::~Asteroid() {
 
 void Asteroid::Update() {
 	
-	float posX = this->worldPosition.GetX();
-	float posY = this->worldPosition.GetY();
+	float posX = worldPosition.GetX();
+	float posY = worldPosition.GetY();
 
 	//Rotate the asteroid
-	this->Rotate(rotationAmount);
+	Rotate(rotationAmount);
 	
 	//Move the asteroid
-	posX += this->moveVector.GetX();
-	posY += this->moveVector.GetY();
-	this->SetPosition(posX, posY);
+	posX += moveVector.GetX();
+	posY += moveVector.GetY();
+	SetPosition(posX, posY);
+
+	//Move the bounding box
+	boundingBox[0] += moveVector.GetX();
+	boundingBox[2] += moveVector.GetX();
+	boundingBox[1] += moveVector.GetY();
+	boundingBox[3] += moveVector.GetY();
 
 	//Check to see if the asteroid is "off screen". If it is, teleport
 	//it to just off screen on the opposite side, such that it "wraps 
@@ -52,8 +58,8 @@ void Asteroid::Update() {
 	bool offScreen = true;
 
 	for (int i = 0; i < 8; ++i) {
-		float pointX = this->asteroidPoints[i].GetX();
-		float pointY = this->asteroidPoints[i].GetY();
+		float pointX = asteroidPoints[i].GetX();
+		float pointY = asteroidPoints[i].GetY();
 
 		if (posX + pointX < 1.0f 
 			&& posX + pointX > -1.0f
@@ -96,13 +102,13 @@ void Asteroid::Update() {
 			newX = 0;
 			newY = 0;
 		}
-		this->SetPosition(newX, newY);
+		SetPosition(newX, newY);
 
 	}
 }
 
 void Asteroid::SetMoveVector(Vector2D* newVector) {
-	this->moveVector = *newVector;
+	moveVector = *newVector;
 }
 
 void Asteroid::Rotate(float angle) {
@@ -110,27 +116,34 @@ void Asteroid::Rotate(float angle) {
 		asteroidPoints[currentPoint].Rotate(angle,
 			       			new Vector2D(0, 0));
 	}
+	RecalculateBB();
 }
 
 void Asteroid::SetPosition(float x, float y) {
-	this->worldPosition.SetX(x);
-	this->worldPosition.SetY(y);
+	worldPosition.SetX(x);
+	worldPosition.SetY(y);
 }
 
 void Asteroid::Render() {
-	float tempX = this->worldPosition.GetX();
-	float tempY = this->worldPosition.GetY();
+	float tempX = worldPosition.GetX();
+	float tempY = worldPosition.GetY();
 
 	glBegin(GL_LINE_LOOP);
 	for(int currentPoint = 0; currentPoint < 8; ++ currentPoint)
-		glVertex2f(tempX + this->asteroidPoints[currentPoint].GetX(),
-			tempY + this->asteroidPoints[currentPoint].GetY());
+		glVertex2f(tempX + asteroidPoints[currentPoint].GetX(),
+			tempY + asteroidPoints[currentPoint].GetY());
 	glEnd();
 	
-}
+	//Testing, draw Bounding Box
+	
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(boundingBox[0], boundingBox[1]);
+	glVertex2f(boundingBox[2], boundingBox[1]);
+	glVertex2f(boundingBox[2], boundingBox[3]);
+	glVertex2f(boundingBox[0], boundingBox[3]);
+	glEnd();
 
-bool Asteroid::AABB(GameObject* target) {
-	//TODO
 }
 
 bool Asteroid::SAT(GameObject* target) {
@@ -144,32 +157,62 @@ void Asteroid::Collide() {
 void Asteroid::ApplyGravity(GameObject* target) {
 	float newX, newY, posX, posY, targetX, targetY;
 
-	posX = this->worldPosition.GetX();
-	posY = this->worldPosition.GetY();
+	posX = worldPosition.GetX();
+	posY = worldPosition.GetY();
 	targetX = target->GetPosition()->GetX();
 	targetY = target->GetPosition()->GetY();
 
 	newX = ((targetX - posX) * target->GetMass());
 	newY = ((targetY - posY) * target->GetMass());
 
-	this->moveVector.SetX(this->moveVector.GetX() + newX);
-	this->moveVector.SetY(this->moveVector.GetY() + newY);
+	moveVector.SetX(moveVector.GetX() + newX);
+	moveVector.SetY(moveVector.GetY() + newY);
 }
 
 Vector2D* Asteroid::GetPosition() {
-	return &this->worldPosition;
+	return &worldPosition;
 }
 
 float Asteroid::GetMass() {
-	return this->mass;
+	return mass;
 }
 
 void Asteroid::SetMass(float mass) {
 	this->mass = mass;
 }
 
+//This should ONLY be called if this object rotates.
+//Movement of the box should be handled in the Update function
 void Asteroid::RecalculateBB() {
-	//TODO
+	float maxX, minX, maxY, minY;
+
+	maxX = worldPosition.GetX();
+	minX = worldPosition.GetX();
+	maxY = worldPosition.GetY();
+	minY = worldPosition.GetY();
+	
+	float tempX = worldPosition.GetX();
+	float tempY = worldPosition.GetY();
+	
+	Vector2D* currentPoint;
+
+	for (int curPoint = 0; curPoint < 8; ++curPoint) {
+		currentPoint = &asteroidPoints[curPoint];
+		if (tempX + currentPoint->GetX() < minX)
+		       minX = tempX + currentPoint->GetX();
+		if (tempX + currentPoint->GetX() > maxX)
+		       maxX = tempX + currentPoint->GetX();
+		if (tempY + currentPoint->GetY() < minY)
+		       minY = tempY + currentPoint->GetY();
+		if (tempY + currentPoint->GetY() > maxY)
+		       maxY = tempY + currentPoint->GetY();
+	}
+
+	boundingBox[0] = minX;
+	boundingBox[2] = maxX;
+	boundingBox[1] = minY;
+	boundingBox[3] = maxY;
+
 }
 
 //Displaces an 8 point polygon such that it resembles an asteroid
@@ -232,5 +275,7 @@ void Asteroid::GenerateAsteroid() {
 	asteroidPoints[7].SetX(-defaultValue + randMod);
 	randMod = ((rand() % (int)upperBound) + lowerBound) / divisor;
 	asteroidPoints[7].SetY(0.0f);
-	
+
+	//Generate the bounding box
+	RecalculateBB();	
 }

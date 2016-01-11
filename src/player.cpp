@@ -1,23 +1,26 @@
 #include "player.h"
 
 Player::Player() {
-	this->worldPosition.SetX(0);
-	this->worldPosition.SetY(0);
+	worldPosition.SetX(0);
+	worldPosition.SetY(0);
 
 	//Construct the player graphic
-	this->shipPoints[0].SetX(-0.01f);
-	this->shipPoints[0].SetY(-0.02f);
-	this->shipPoints[1].SetX(0.0f);
-	this->shipPoints[1].SetY(0.0f);
-	this->shipPoints[2].SetX(0.01f);
-	this->shipPoints[2].SetY(-0.02f);
-	this->shipPoints[3].SetX(0);
-	this->shipPoints[3].SetY(0.02f);
+	shipPoints[0].SetX(-0.01f);
+	shipPoints[0].SetY(-0.02f);
+	shipPoints[1].SetX(0.0f);
+	shipPoints[1].SetY(0.0f);
+	shipPoints[2].SetX(0.01f);
+	shipPoints[2].SetY(-0.02f);
+	shipPoints[3].SetX(0);
+	shipPoints[3].SetY(0.02f);
 
 	//Set the movement variables
-	this->acceleration = 0.004f;
-	this->deceleration = 0.001f;
-	this->currentRotation = 0;
+	acceleration = 0.004f;
+	deceleration = 0.001f;
+	currentRotation = 0;
+
+	//Generate the bounding box
+	RecalculateBB();
 }
 
 Player::~Player() {
@@ -26,48 +29,54 @@ Player::~Player() {
 
 void Player::Update() {
 	
-	float posX = this->worldPosition.GetX();
-	float posY = this->worldPosition.GetY();
+	float posX = worldPosition.GetX();
+	float posY = worldPosition.GetY(); 
 
 	//Accelerate / decelerate as necessarry
 	
-	if (this->moving) {
-		if (this->currentVelocity + this->acceleration  < 
-				this->maximumVelocity)
-			this->currentVelocity += this->acceleration;
+	if (moving) {
+		if (currentVelocity + acceleration  < 
+				maximumVelocity)
+			currentVelocity += acceleration;
 		else
-			this->currentVelocity = this->maximumVelocity;
+			currentVelocity = maximumVelocity;
 	} else {
-		if (this->currentVelocity - this->deceleration > 0)
-			this->currentVelocity -= this->deceleration;	
+		if (currentVelocity - deceleration > 0)
+			currentVelocity -= deceleration;	
 		else
-			this->currentVelocity = 0;
+			currentVelocity = 0;
 	}
 
-	if (this->rotating) {
-		this->Rotate(currentRotationAmount);
+	if (rotating) {
+		Rotate(currentRotationAmount);
 	} else {
 
 	}
 	
 	//Update the moveVector
 	
-	this->moveVector.SetX(0);
-	this->moveVector.SetY(this->currentVelocity);
-	this->moveVector.Rotate(this->currentRotation, new Vector2D(0, 0));
+	moveVector.SetX(0);
+	moveVector.SetY(currentVelocity);
+	moveVector.Rotate(currentRotation, new Vector2D(0, 0));
 
 	//Move the player according to the movement vector
-	posX += this->moveVector.GetX();
-	posY += this->moveVector.GetY();
-	this->SetPosition(posX, posY);
+	posX += moveVector.GetX();
+	posY += moveVector.GetY();
+	SetPosition(posX, posY);
+
+	//Move the bounding box
+	boundingBox[0] += moveVector.GetX();
+	boundingBox[2] += moveVector.GetX();
+	boundingBox[1] += moveVector.GetY();
+	boundingBox[3] += moveVector.GetY();
 
 	//Handle wrapping around the screen
 	
 	bool offScreen = true;
 
 	for (int i = 0; i < 4; ++i) {
-		float pointX = this->shipPoints[i].GetX();
-		float pointY = this->shipPoints[i].GetY();
+		float pointX = shipPoints[i].GetX();
+		float pointY = shipPoints[i].GetY();
 
 		if (posX + pointX < 1.0f
 			&& posX + pointX > -1.0f
@@ -103,47 +112,47 @@ void Player::Update() {
 			newX = 0;
 			newY = 0;
 		}
-		this->SetPosition(newX, newY);
+		SetPosition(newX, newY);
 	}
 
 }
 
 void Player::SetMoveVector(Vector2D* newVector) {
 	
-	this->moveVector = *newVector;
+	moveVector = *newVector;
 }
 
 void Player::SetPosition(float x, float y) {
 	
-	this->worldPosition.SetX(x);
-	this->worldPosition.SetY(y);
+	worldPosition.SetX(x);
+	worldPosition.SetY(y);
 }
 
 void Player::SetVelocity(float velocity) {
 	
-	this->currentVelocity = velocity;
+	currentVelocity = velocity;
 }
 
 void Player::BeginSmoothRotation(float angle) {
 	
-	this->rotating = true;
-	this->currentRotationAmount = angle;
+	rotating = true;
+	currentRotationAmount = angle;
 }
 
 void Player::StopSmoothRotation() {
 
-	this->rotating = false;
+	rotating = false;
 }
 
 void Player::BeginAcceleration(float velocity) {
 
-	this->moving = true;
-	this->maximumVelocity = velocity;
+	moving = true;
+	maximumVelocity = velocity;
 }
 
 void Player::StopAcceleration() {
 	
-	this->moving = false;
+	moving = false;
 }
 void Player::Rotate(float angle) {
 
@@ -157,26 +166,69 @@ void Player::Rotate(float angle) {
 
 	//Update the ship's vector graphics
 	for (int i = 0; i < 4; ++i) {
-		this->shipPoints[i].Rotate(angle, new Vector2D(0.0f, 0.0f));
+		shipPoints[i].Rotate(angle, new Vector2D(0.0f, 0.0f));
 	}
 
 	//Rotate the movement vector
 	//this->moveVector.Rotate(angle, new Vector2D(0.0f, 0.0f));	
+	
+	//Recalculate the bounding box
+	RecalculateBB();
 }
 
 void Player::Render() {
-	float tempX = this->worldPosition.GetX();
-	float tempY = this->worldPosition.GetY();
+	float tempX = worldPosition.GetX();
+	float tempY = worldPosition.GetY();
 
 	glBegin(GL_LINE_LOOP);
 	for (int currentPoint = 0; currentPoint < 4; ++ currentPoint)
-		glVertex2f(tempX + this->shipPoints[currentPoint].GetX(),
-			tempY + this->shipPoints[currentPoint].GetY());
+		glVertex2f(tempX + shipPoints[currentPoint].GetX(),
+			tempY + shipPoints[currentPoint].GetY());
+	glEnd();
+
+
+	//testing, draw the bounding box
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(boundingBox[0], boundingBox[1]);
+	glVertex2f(boundingBox[2], boundingBox[1]);
+	glVertex2f(boundingBox[2], boundingBox[3]);
+	glVertex2f(boundingBox[0], boundingBox[3]);
 	glEnd();
 
 }
 
-bool Player::AABB(GameObject* target) {
+//recalculate the bounding box for AABB collision detection. 
+void Player::RecalculateBB() {
+	float maxX, minX, maxY, minY;
+
+	maxX = worldPosition.GetX();
+	minX = worldPosition.GetX();
+	maxY = worldPosition.GetY();
+	minY = worldPosition.GetY();
+
+	float tempX = worldPosition.GetX();
+	float tempY = worldPosition.GetY();
+
+	Vector2D* currentPoint;
+
+	for (int curPoint = 0; curPoint < 4; ++ curPoint) {
+		currentPoint = &shipPoints[curPoint];
+
+		if (tempX + currentPoint->GetX() < minX)
+			minX = tempX + currentPoint->GetX();
+		if (tempX + currentPoint->GetX() > maxX)
+			maxX = tempX + currentPoint->GetX();
+		if (tempY + currentPoint->GetY() < minY)
+			minY = tempY + currentPoint->GetY();
+		if (tempY + currentPoint->GetY() > maxY)
+			maxY = tempY + currentPoint->GetY();
+	}
+
+	boundingBox[0] = minX;
+	boundingBox[2] = maxX;
+	boundingBox[1] = minY;
+	boundingBox[3] = maxY;
 
 }
 
@@ -191,25 +243,25 @@ void Player::Collide() {
 void Player::ApplyGravity(GameObject* target) {
 	float newX, newY, posX, posY, targetX, targetY;
 
-	posX = this->worldPosition.GetX();
-	posY = this->worldPosition.GetY();
+	posX = worldPosition.GetX();
+	posY = worldPosition.GetY();
 	targetX = target->GetPosition()->GetX();
 	targetY = target->GetPosition()->GetY();
 
 	newX = ((targetX - posX) * target->GetMass());
 	newY = ((targetY - posY) * target->GetMass());
 
-	this->moveVector.SetX(this->moveVector.GetX() + newX);
-	this->moveVector.SetY(this->moveVector.GetY() + newY);
+	moveVector.SetX(moveVector.GetX() + newX);
+	moveVector.SetY(moveVector.GetY() + newY);
 
 }
 
 Vector2D* Player::GetPosition() {
-	return &this->worldPosition;
+	return &worldPosition;
 }
 
 float Player::GetMass() {
-	return this->mass;
+	return mass;
 }
 
 void Player::SetMass(float mass) {

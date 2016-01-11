@@ -2,7 +2,7 @@ CC = gcc
 CXX = g++
 RM = rm -f
 
-OBJS = main.o vector2D.o asteroid.o player.o
+OBJS = main.o vector2D.o asteroid.o player.o gameobject.o
 LDLIBS = -lGL -lGLU -lglut
 ARGS = -std=c++11 -Wall -g
 
@@ -22,6 +22,9 @@ asteroid.o: asteroid.cpp asteroid.h gameobject.h
 
 player.o: player.cpp player.h gameobject.h
 	$(CXX) $(ARGS) -c player.cpp -o player.o
+
+gameobject.o: gameobject.cpp gameobject.h
+	$(CXX) $(ARGS) -c gameobject.cpp -o gameobject.o
 
 clean:
 	$(RM) $(OBJS)

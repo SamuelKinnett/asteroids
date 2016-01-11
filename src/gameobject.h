@@ -1,5 +1,5 @@
 //*****************************************************************************
-//An abstract class that all game objects must inherit from
+//A base class that all game objects must inherit from
 //
 //Samuel Kinnett, 2015
 //*****************************************************************************
@@ -8,6 +8,7 @@
 #define GAME_OBJECT_H
 
 #include "vector2D.h"
+#include "vectorimage.h"
 
 class GameObject {
 
@@ -17,7 +18,6 @@ class GameObject {
 		virtual void SetPosition(float, float) = 0;
 		virtual void Rotate(float) = 0;
 		virtual void Render() = 0;
-		virtual bool AABB(GameObject*) = 0;
 		//Axis Alligned Bounding Box collision detection
 		virtual bool SAT(GameObject*) = 0;
 		//Separating Axis Theorem collision detection
@@ -27,8 +27,13 @@ class GameObject {
 		virtual Vector2D* GetPosition() = 0;
 		virtual float GetMass() = 0;
 		virtual void SetMass(float) = 0;
-
+	
+		//Non-virtual functions	
+		bool AABB(GameObject*);
+		float* GetBB();
 		bool gravAffected = false;	//Is the object affected by gravity?
+		float boundingBox[4];
+		float colour[4];
 };
 
 #endif

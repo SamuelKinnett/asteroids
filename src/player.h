@@ -24,7 +24,6 @@ class Player : public GameObject {
 		virtual void SetPosition(float, float);
 		virtual void Rotate(float);
 		virtual void Render();
-		virtual bool AABB(GameObject*);
 		virtual bool SAT(GameObject*);
 		virtual void Collide();
 		virtual void ApplyGravity(GameObject*);
@@ -33,6 +32,7 @@ class Player : public GameObject {
 		virtual float GetMass();
 		virtual void SetMass(float);
 
+		void RecalculateBB();
 		void BeginSmoothRotation(float);
 		void StopSmoothRotation();
 		void BeginAcceleration(float);
@@ -46,7 +46,6 @@ class Player : public GameObject {
 		Vector2D worldPosition;
 		Vector2D moveVector;
 		float mass;
-
 		float currentRotation;
 		float currentRotationAmount;
 		bool rotating;
