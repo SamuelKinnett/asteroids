@@ -57,6 +57,13 @@ void Asteroid::Update() {
 	
 	bool offScreen = true;
 
+	if (boundingBox[2] > -1
+		&& boundingBox[0] < 1
+		&& boundingBox[3] > -1
+		&& boundingBox[1] < 1)
+		offScreen = false;
+
+	/* OLD METHOD
 	for (int i = 0; i < 8; ++i) {
 		float pointX = asteroidPoints[i].GetX();
 		float pointY = asteroidPoints[i].GetY();
@@ -72,11 +79,27 @@ void Asteroid::Update() {
 		}	
 			
 	}
+	*/
 
-	//TODO: Intelligently place the asteroids on the opposite side so
-	//that there is never a "sudden appearance", but rather the asteroid
-	//smoothly transitions
+	if (offScreen) {
+		if (boundingBox[2] < -1) {
+			//The asteroid has gone off the left of the screen
+			SetPosition(0.99f + (posX - boundingBox[0]), posY);
+		} else if (boundingBox[0] > 1) {
+			//The asteroid has gone off the right of the screen
+			SetPosition(-0.99f + (posX - boundingBox[2]), posY);
+		} else if (boundingBox[3] < -1) {
+			//The asteroid has gone off the bottom of the screen
+			SetPosition(posX, 0.99f + (posY - boundingBox[1]));
+		} else if (boundingBox[1] > 1) {
+			//The asteroid has gone off the top of the screen
+			SetPosition(posX, -0.99f + (posY - boundingBox[3]));
+		} else {
+			//Error I guess
+		}
+	}
 
+	/* OLD METHOD
 	if (offScreen) {
 		float newX, newY;
 		if (posX > 1.0f) {
@@ -105,6 +128,7 @@ void Asteroid::Update() {
 		SetPosition(newX, newY);
 
 	}
+	*/
 }
 
 void Asteroid::SetMoveVector(Vector2D* newVector) {
